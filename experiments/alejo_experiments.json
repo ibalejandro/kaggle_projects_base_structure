@@ -1,0 +1,19 @@
+{
+    "alejo_first_experiment": {
+        "model_name": "alejo_first_model",
+        "data_generation_type": "first_generation_type",
+        "num_of_sub_experiments": 0,
+        "default_hyperparameters": [
+            {
+                "optimizer": "adam",
+                "lr": 0.001,
+                "epochs": 1
+            }
+        ],
+        "sampling_hyperparameters": {
+            "optimizer": ["adam", "rmsprop"],
+            "lr": [0.0001, 0.001],
+            "epochs": [1, 3]
+        }
+    }
+}
