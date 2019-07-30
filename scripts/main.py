@@ -4,6 +4,8 @@ import os
 import json
 import data_generator
 import hp_sampler
+import trainer
+import predictor
 
 parser = argparse.ArgumentParser(description="Controller explanation")
 parser.add_argument(
@@ -18,12 +20,12 @@ parser.add_argument(
 )
 parser.add_argument(
     "--train",
-    default=False,
+    default="False",
     help="provide whether to train the model"
 )
 parser.add_argument(
     "--predict",
-    default=False,
+    default="False",
     help="provide whether to predict using the model"
 )
 namespace = parser.parse_args()
@@ -38,12 +40,12 @@ if member_name is not None:
             with open(experiments_path) as experiments_file:
                 experiments = json.load(experiments_file)
                 if experiment_name in experiments:
+                    experiment = experiments[experiment_name]
+                    data_generation_type = experiment["data_generation_type"]
+                    dict_of_data = getattr(data_generator, data_generation_type)(should_train=should_train,
+                                                                                 should_predict=should_predict)
                     if should_train:
-                        experiment = experiments[experiment_name]
                         model_name = experiment["model_name"]
-                        data_generation_type = experiment["data_generation_type"]
-                        dict_of_data = getattr(data_generator, data_generation_type)(should_train=should_train,
-                                                                                     should_predict=should_predict)
                         num_of_sub_experiments = experiment["num_of_sub_experiments"]
                         if num_of_sub_experiments == 0:
                             dicts_of_hyperparameters = experiment["default_hyperparameters"]
@@ -51,8 +53,11 @@ if member_name is not None:
                             dicts_of_hyperparameters = hp_sampler \
                                 .sample_hyperparameters(num_of_sub_experiments=num_of_sub_experiments,
                                                         grid=experiment["sampling_hyperparameters"])
+                        # TODO add trainer process.
                     if should_predict:
-                        pass
+                        test_ids = data_generator.get_test_ids()
+                        predictor.make_predictions(experiment_name=experiment_name, dict_of_data=dict_of_data,
+                                                   test_ids=test_ids)
                 else:
                     print("The experiment '{}' does not exist within the file '{}'.".format(experiment_name,
                                                                                             experiments_path))
