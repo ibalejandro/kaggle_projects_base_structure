@@ -1,11 +1,12 @@
 import argparse
 import ast
-import os
 import json
+import os
+
 import data_generator
 import hp_sampler
-import trainer
 import predictor
+import trainer
 
 parser = argparse.ArgumentParser(description="Controller explanation")
 parser.add_argument(
@@ -53,7 +54,9 @@ if member_name is not None:
                             dicts_of_hyperparameters = hp_sampler \
                                 .sample_hyperparameters(num_of_sub_experiments=num_of_sub_experiments,
                                                         grid=experiment["sampling_hyperparameters"])
-                        # TODO add trainer process.
+                        trainer.fit_model(experiment_name=experiment_name, model_name=model_name,
+                                          data_generation_type=data_generation_type, dict_of_data=dict_of_data,
+                                          dicts_of_hps=dicts_of_hyperparameters)
                     if should_predict:
                         test_ids = data_generator.get_test_ids()
                         predictor.make_predictions(experiment_name=experiment_name, dict_of_data=dict_of_data,

@@ -1,11 +1,10 @@
-from tensorflow.keras.models import model_from_json
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from tensorflow.keras.optimizers import Adam
 import json
 import os
+import trainer
 import pandas as pd
-
-LOSS = SparseCategoricalCrossentropy()
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from tensorflow.keras.models import model_from_json
+from tensorflow.keras.optimizers import Adam
 
 
 def make_predictions(experiment_name, dict_of_data, test_ids):
@@ -19,12 +18,12 @@ def make_predictions(experiment_name, dict_of_data, test_ids):
             X_test = dict_of_data["X_test"]
             is_generator = dict_of_data["is_generator"]
             optimizer = get_optimizer(model_path=model_path)
-            print("Loading model {}...".format(experiment_name))
+            print("Loading model '{}'...".format(experiment_name))
             with open(structure_path, 'r') as json_file:
                 model = model_from_json(json_file.read())
             model.load_weights(weights_path)
-            model.compile(loss=LOSS, optimizer=optimizer)
-            print("Model {} loaded.".format(experiment_name))
+            model.compile(loss=trainer.LOSS, optimizer=optimizer)
+            print("Model '{}' loaded.".format(experiment_name))
             print("Predicting...")
             if is_generator:
                 predictions = model.predict_generator(X_test)
@@ -33,9 +32,9 @@ def make_predictions(experiment_name, dict_of_data, test_ids):
             print("Predictions made.")
             generate_submission_file(test_ids=test_ids, predictions=predictions, submission_path=submission_path)
         else:
-            print("The submission file already exists for model {}.".format(experiment_name))
+            print("The submission file already exists for model '{}'.".format(experiment_name))
     else:
-        print("The model {} doesn't exist.".format(experiment_name))
+        print("The model '{}' doesn't exist.".format(experiment_name))
 
 
 def get_optimizer(model_path):
@@ -53,7 +52,7 @@ def get_optimizer(model_path):
 def generate_submission_file(test_ids, predictions, submission_path):
     """Generate the submission file using the given information."""
     print("Generating the submission file...")
-    submission_as_dict = {"Id": test_ids, "Visits": predictions}
+    submission_as_dict = {"id": test_ids, "label": predictions}
     with open(submission_path, 'w') as submission_csv:
         pd.DataFrame.from_dict(submission_as_dict).to_csv(submission_csv, mode='w', index=False)
-    print("The {} file was successfully generated.".format(submission_path))
+    print("The '{}' file was successfully generated.".format(submission_path))
