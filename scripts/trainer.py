@@ -93,9 +93,9 @@ def fit_model(experiment_name, model_name, data_generation_type, dict_of_data, d
             model.fit_generator(dict_of_data["X_train"], epochs=hps["epochs"], validation_data=dict_of_data["X_val"],
                                 callbacks=[persistence_callback], verbose=1)
         else:
-            model.fit(x=dict_of_data["X_train"], y=dict_of_data["y_train"], epochs=hps["epochs"],
-                      validation_data=(dict_of_data["X_val"], dict_of_data["y_val"]), callbacks=[persistence_callback],
-                      verbose=1)
+            model.fit(x=dict_of_data["X_train"], y=dict_of_data["y_train"], batch_size=hps["batch_size"],
+                      epochs=hps["epochs"], validation_data=(dict_of_data["X_val"], dict_of_data["y_val"]),
+                      callbacks=[persistence_callback], verbose=1)
         # Keep track of the best train_val_scores (best model's result) until the moment.
         train_val_scores = (persistence_callback.train_score, persistence_callback.val_score)
         print("Model {} of {} successfully trained.".format(i, len(dicts_of_hps)))
