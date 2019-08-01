@@ -1,3 +1,8 @@
+import pandas as pd
+
+DATA_PATH = "../data/"
+
+
 def first_generation_type(should_train, should_predict):
     """Generate a dictionary of data for training or testing."""
     dict_of_data = {}

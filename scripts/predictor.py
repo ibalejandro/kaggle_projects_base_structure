@@ -1,8 +1,8 @@
 import json
 import os
-import trainer
+
 import pandas as pd
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
+import trainer
 from tensorflow.keras.models import model_from_json
 from tensorflow.keras.optimizers import Adam
 

@@ -5,12 +5,12 @@ import model_factory
 from six.moves import cPickle as pickle
 from tensorflow.keras.backend import clear_session
 from tensorflow.keras.callbacks import Callback
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from tensorflow.keras.losses import MeanSquaredError
 from tensorflow.keras.optimizers import Adam
 
-LOSS = SparseCategoricalCrossentropy()
+LOSS = MeanSquaredError()
 OBJECTIVE = "MIN"
-TARGET_METRIC = "loss"
+TARGET_METRIC = "mean_squared_error"
 
 
 class PersistenceCallback(Callback):
@@ -27,22 +27,27 @@ class PersistenceCallback(Callback):
         self.config_path = config_path
         self.config = config
         # Dictionary for updating history on epoch end.
-        self.model_history = {"loss": [], "val_loss": [], "acc": [], "val_acc": []}
+        self.model_history = {"loss": [], "val_loss": [], "acc": [], "val_acc": [], self.train_metric: [],
+                              self.val_metric: []}
+        self.should_update_history = False
         super().__init__()
 
     def on_epoch_end(self, epoch, logs={}):
-        # Update history information.
-        for metric in self.model_history.keys():
-            self.model_history[metric].append(logs[metric])
-        with open(self.history_path, "wb") as history_file:
-            pickle.dump(self.model_history, history_file)
         # Update model and config information, if necessary.
         if self.objective == "MIN":
             if logs[self.val_metric] < self.val_score:
+                self.should_update_history = True
                 self.update_information(logs=logs)
         else:
             if logs[self.val_metric] > self.val_score:
+                self.should_update_history = True
                 self.update_information(logs=logs)
+        # Update history information on disk, if necessary.
+        for metric in self.model_history.keys():
+            self.model_history[metric].append(logs[metric])
+        if self.should_update_history:
+            with open(self.history_path, "wb") as history_file:
+                pickle.dump(self.model_history, history_file)
 
     def update_information(self, logs):
         self.train_score = logs[self.train_metric]
@@ -83,7 +88,7 @@ def fit_model(experiment_name, model_name, data_generation_type, dict_of_data, d
                                                    config_path=config_path, config=config)
         model = getattr(model_factory, model_name)(hps=hps, input_shapes=input_shapes)
         optimizer = get_optimizer(optimizer_as_string=hps["optimizer"], lr=hps["lr"])
-        model.compile(loss=LOSS, optimizer=optimizer, metrics=["accuracy"])
+        model.compile(loss=LOSS, optimizer=optimizer, metrics=["accuracy", TARGET_METRIC])
         if is_generator:
             model.fit_generator(dict_of_data["X_train"], epochs=hps["epochs"], validation_data=dict_of_data["X_val"],
                                 callbacks=[persistence_callback], verbose=1)
