@@ -5,6 +5,7 @@ DATA_PATH = "../data/"
 
 def first_generation_type(should_train, should_predict):
     """Generate a dictionary of data for training or testing."""
+    print("Generating data...")
     dict_of_data = {}
     if should_train:
         X_train = []
@@ -20,6 +21,7 @@ def first_generation_type(should_train, should_predict):
         dict_of_data["X_test"] = X_test
     dict_of_data["input_shapes"] = []
     dict_of_data["is_generator"] = False
+    print("Data generated.")
     return dict_of_data
 
 
