@@ -30,7 +30,9 @@ def make_predictions(experiment_name, dict_of_data, test_ids):
             else:
                 predictions = model.predict(X_test)
             print("Predictions made.")
-            generate_submission_file(test_ids=test_ids, predictions=predictions, submission_path=submission_path)
+            generate_submission_file(predictions=predictions,
+                                     prediction_transformations=dict_of_data["prediction_transformations"],
+                                     test_ids=test_ids, submission_path=submission_path)
         else:
             print("The submission file already exists for model '{}'.".format(experiment_name))
     else:
@@ -49,7 +51,7 @@ def get_optimizer(model_path):
     return optimizer
 
 
-def generate_submission_file(test_ids, predictions, submission_path):
+def generate_submission_file(predictions, prediction_transformations, test_ids, submission_path):
     """Generate the submission file using the given information."""
     print("Generating the submission file...")
     submission_as_dict = {"id": test_ids, "label": predictions}

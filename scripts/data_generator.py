@@ -18,7 +18,9 @@ def first_generation_type(should_train, should_predict):
         dict_of_data["y_val"] = y_val
     if should_predict:
         X_test = []
+        prediction_transformations = []
         dict_of_data["X_test"] = X_test
+        dict_of_data["prediction_transformations"] = prediction_transformations
     dict_of_data["input_shapes"] = []
     dict_of_data["is_generator"] = False
     print("Data generated.")

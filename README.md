@@ -14,8 +14,8 @@ addition, add extra conditional cases to the get_optimizer(optimizer_as_string, 
 to use other optimizers different from "Adam".
 - Add extra conditional cases to the get_optimizer(model_path) method on the predictor.py file if you want to use other
 optimizers different from "Adam".
-- Modify the generate_submission_file(test_ids, predictions, submission_path) method on the predictor.py file according
-to the submission format for the challenge.
+- Modify the generate_submission_file(predictions, prediction_transformations, test_ids, submission_path) method on the
+predictor.py file according to the submission format for the challenge.
 
 - For running your experiment, type on the terminal:
 
